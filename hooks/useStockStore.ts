@@ -4,7 +4,7 @@ import { StockItem, StockHistory, StockConfig } from '../types';
 
 const DEFAULT_CONFIG: StockConfig = {
   tipos: ['Motor', 'ABS', 'EBS', 'Retarder', 'Outros'],
-  frequencias: ['40 MHz', '80 MHz', '120 MHz', 'Outra']
+  frequencias: ['Sem Frequência', '40 MHz', '80 MHz', '120 MHz', 'Outra']
 };
 
 export const useStockStore = () => {
