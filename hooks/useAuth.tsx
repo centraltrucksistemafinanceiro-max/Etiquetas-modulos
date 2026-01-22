@@ -33,36 +33,41 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
-      setUser(firebaseUser);
-      
-      if (firebaseUser) {
-        // Fetch profile
-        const docRef = doc(db, 'users', firebaseUser.uid);
-        const docSnap = await getDoc(docRef);
+      try {
+        setUser(firebaseUser);
         
-        if (docSnap.exists()) {
-          setProfile(docSnap.data() as UserProfile);
+        if (firebaseUser) {
+          // Fetch profile
+          const docRef = doc(db, 'users', firebaseUser.uid);
+          const docSnap = await getDoc(docRef);
+          
+          if (docSnap.exists()) {
+            setProfile(docSnap.data() as UserProfile);
+          } else {
+            // Check if it's the first user
+            const usersCol = collection(db, 'users');
+            const usersSnapshot = await getDocs(query(usersCol, limit(1)));
+            
+            const isFirstUser = usersSnapshot.empty;
+            const newProfile: UserProfile = {
+              uid: firebaseUser.uid,
+              email: firebaseUser.email || '',
+              role: isFirstUser ? 'admin' : 'user',
+              name: firebaseUser.displayName || firebaseUser.email?.split('@')[0] || 'Usuário'
+            };
+            
+            await setDoc(doc(db, 'users', firebaseUser.uid), newProfile);
+            setProfile(newProfile);
+          }
         } else {
-          // Check if it's the first user
-          const usersCol = collection(db, 'users');
-          const usersSnapshot = await getDocs(query(usersCol, limit(1)));
-          
-          const isFirstUser = usersSnapshot.empty;
-          const newProfile: UserProfile = {
-            uid: firebaseUser.uid,
-            email: firebaseUser.email || '',
-            role: isFirstUser ? 'admin' : 'user',
-            name: firebaseUser.displayName || firebaseUser.email?.split('@')[0] || 'Usuário'
-          };
-          
-          await setDoc(doc(db, 'users', firebaseUser.uid), newProfile);
-          setProfile(newProfile);
+          setProfile(null);
         }
-      } else {
+      } catch (error) {
+        console.error("Erro na autenticação/perfil:", error);
         setProfile(null);
+      } finally {
+        setLoading(false);
       }
-      
-      setLoading(false);
     });
 
     return () => unsubscribe();
