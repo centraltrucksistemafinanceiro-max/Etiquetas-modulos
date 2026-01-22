@@ -20,7 +20,10 @@ const Header: React.FC<HeaderProps> = ({
   onTabChange 
 }) => {
   const { profile, logout } = useAuth();
-  const { isInstallable, installApp } = usePWAInstall();
+  const { isInstallable, isIOS, isStandalone, installApp } = usePWAInstall();
+
+  // Não mostrar botão se já estiver instalado
+  const showInstallButton = !isStandalone && (isInstallable || isIOS);
 
   return (
     <>
@@ -70,13 +73,13 @@ const Header: React.FC<HeaderProps> = ({
               )}
             </nav>
 
-            {isInstallable && (
+            {showInstallButton && (
               <button 
                 onClick={installApp}
                 className="flex items-center gap-2 px-3 py-1.5 bg-indigo-600/20 border border-indigo-500/40 rounded-xl text-[10px] font-black text-indigo-400 hover:bg-indigo-600 hover:text-white transition-all animate-pulse"
               >
                 <Download className="w-3.5 h-3.5" />
-                <span className="hidden xs:inline">Instalar App</span>
+                <span className="hidden xs:inline">{isIOS ? 'Instalar no iPhone' : 'Instalar App'}</span>
               </button>
             )}
 
