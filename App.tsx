@@ -30,6 +30,7 @@ const AppContent: React.FC = () => {
     loading: labelLoading,
     handleInputChange,
     handleSettingChange,
+    handleSelectModule,
     clearForm,
     saveToHistory,
     loadFromHistory,
@@ -48,6 +49,11 @@ const AppContent: React.FC = () => {
   } = useStockStore();
 
   const handlePrint = async () => {
+    if (!data.stockItemId) {
+      alert("ERRO: Vincule um Módulo do Estoque antes de imprimir a etiqueta.");
+      return;
+    }
+
     // Abrimos a janela IMEDIATAMENTE antes do await para evitar bloqueio de pop-up pelo navegador
     const printWindow = window.open('', '_blank');
     
@@ -161,7 +167,12 @@ const AppContent: React.FC = () => {
                   </button>
                 </div>
                 <div className="p-6">
-                  <FormComponent data={data} onChange={handleInputChange} />
+                  <FormComponent 
+                    data={data} 
+                    stock={stock}
+                    onChange={handleInputChange} 
+                    onSelectModule={handleSelectModule} 
+                  />
                 </div>
               </div>
 

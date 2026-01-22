@@ -7,7 +7,8 @@ export const initialData: LabelData = {
   placa: '',
   frota: '',
   data: new Date().toISOString().split('T')[0],
-  observacao: ''
+  observacao: '',
+  stockItemId: ''
 };
 
 export const initialSettings: LabelSettings = {

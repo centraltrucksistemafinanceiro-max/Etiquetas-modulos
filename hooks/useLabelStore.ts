@@ -10,7 +10,7 @@ import {
   orderBy 
 } from 'firebase/firestore';
 import { db } from '../firebase';
-import { HistoryItem, LabelData, LabelSettings } from '../types';
+import { HistoryItem, LabelData, LabelSettings, StockItem } from '../types';
 import { initialData, initialSettings } from '../constants/defaults';
 
 export const useLabelStore = () => {
@@ -65,6 +65,14 @@ export const useLabelStore = () => {
   }, []);
 
   // Form Handlers
+  const handleSelectModule = (module: StockItem) => {
+    setData(prev => ({
+      ...prev,
+      stockItemId: module.id,
+      frota: module.id ? module.serial : prev.frota // Preenche o campo Frota/ID com o Serial do módulo
+    }));
+  };
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setData(prev => ({ ...prev, [name]: value }));
@@ -131,6 +139,7 @@ export const useLabelStore = () => {
     lastSavedId,
     handleInputChange,
     handleSettingChange,
+    handleSelectModule,
     clearForm,
     saveToHistory,
     loadFromHistory,

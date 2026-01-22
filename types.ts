@@ -6,6 +6,7 @@ export interface LabelData {
   frota: string;
   data: string;
   observacao: string;
+  stockItemId?: string; // ID do módulo vinculado no estoque
 }
 
 export interface LabelSettings {
