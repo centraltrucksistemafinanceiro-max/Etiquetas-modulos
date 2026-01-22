@@ -144,7 +144,16 @@ const StockTab: React.FC<StockTabProps> = ({
     const newStatus = actionData.status || selectedItem.status;
     const extras: Partial<StockItem> = {
       ...actionData,
-      dataSaida: newStatus === 'Em Manutenção' ? new Date().toLocaleDateString('pt-BR') : actionData.dataSaida
+      dataSaida: newStatus === 'Em Manutenção' ? new Date().toLocaleDateString('pt-BR') : actionData.dataSaida,
+      // Se voltar para estoque, limpamos os campos de empréstimo/manutenção
+      ...(newStatus === 'Em Estoque' ? {
+        localAtual: '',
+        autorizadoPor: '',
+        responsavelManutencao: '',
+        motivoManutencao: '',
+        dataSaida: '',
+        previsaoRetorno: ''
+      } : {})
     };
 
     updateStatus(selectedItem.id, newStatus, extras);
