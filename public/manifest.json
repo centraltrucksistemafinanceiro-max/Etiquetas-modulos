@@ -1,0 +1,17 @@
+{
+  "name": "LabelPrinter Scania Pro",
+  "short_name": "LabelPrinter",
+  "description": "Sistema de Impressão de Etiquetas Scania",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#020617",
+  "theme_color": "#4f46e5",
+  "icons": [
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/9187/9187532.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

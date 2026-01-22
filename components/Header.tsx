@@ -1,7 +1,8 @@
 
 import React from 'react';
-import { Printer, History, LayoutGrid, Package, LogOut, User as UserIcon, Shield } from 'lucide-react';
+import { Printer, History, LayoutGrid, Package, LogOut, User as UserIcon, Shield, Download } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
+import { usePWAInstall } from '../hooks/usePWAInstall';
 
 interface HeaderProps {
   onShowHistory: () => void;
@@ -19,6 +20,7 @@ const Header: React.FC<HeaderProps> = ({
   onTabChange 
 }) => {
   const { profile, logout } = useAuth();
+  const { isInstallable, installApp } = usePWAInstall();
 
   return (
     <>
@@ -67,6 +69,16 @@ const Header: React.FC<HeaderProps> = ({
                 </button>
               )}
             </nav>
+
+            {isInstallable && (
+              <button 
+                onClick={installApp}
+                className="flex items-center gap-2 px-3 py-1.5 bg-indigo-600/20 border border-indigo-500/40 rounded-xl text-[10px] font-black text-indigo-400 hover:bg-indigo-600 hover:text-white transition-all animate-pulse"
+              >
+                <Download className="w-3.5 h-3.5" />
+                <span className="hidden xs:inline">Instalar App</span>
+              </button>
+            )}
 
             <div className="flex items-center gap-2 md:gap-3 bg-slate-900/40 border border-slate-800 px-2 md:px-3 py-1.5 rounded-xl md:rounded-2xl">
               <div className="relative">
