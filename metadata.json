@@ -1,0 +1,7 @@
+{
+  "name": "Smart Label Printer Pro",
+  "description": "A professional label printing system for service orders, featuring real-time preview, AI-assisted data entry, and precise thermal printing layouts.",
+  "requestFramePermissions": [
+    "camera"
+  ]
+}
