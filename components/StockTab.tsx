@@ -128,9 +128,9 @@ const StockTab: React.FC<StockTabProps> = ({
     }
 
     if (modalMode === 'ADD') {
-      onAddItem({ ...formData, dataSaida: formData.status === 'Em Manutenção' ? new Date().toLocaleDateString('pt-BR') : '' });
+      onAddItem({ ...formData, dataSaida: formData.status === 'Em Manutenção' ? new Date().toLocaleDateString('pt-BR') : '' }, profile);
     } else if (modalMode === 'EDIT' && selectedItem) {
-      onEditItem(selectedItem.id, formData);
+      onEditItem(selectedItem.id, formData, profile);
     }
     
     setModalMode('NONE');
@@ -156,7 +156,7 @@ const StockTab: React.FC<StockTabProps> = ({
       } : {})
     };
 
-    updateStatus(selectedItem.id, newStatus, extras);
+    updateStatus(selectedItem.id, newStatus, extras, profile);
     setModalMode('NONE');
     setActionData({});
   };

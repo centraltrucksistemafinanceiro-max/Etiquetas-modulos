@@ -12,7 +12,7 @@ import {
   orderBy
 } from 'firebase/firestore';
 import { db } from '../firebase';
-import { StockItem, StockHistory, StockConfig } from '../types';
+import { StockItem, StockHistory, StockConfig, UserProfile } from '../types';
 
 const DEFAULT_CONFIG: StockConfig = {
   tipos: ['Motor', 'ABS', 'EBS', 'Retarder', 'Outros'],
@@ -53,15 +53,18 @@ export const useStockStore = () => {
     return () => unsubscribe();
   }, []);
 
-  const addStockItem = async (item: Omit<StockItem, 'id' | 'dataAtualizacao' | 'historico'>) => {
+  const addStockItem = async (item: Omit<StockItem, 'id' | 'dataAtualizacao' | 'historico'>, profile: UserProfile | null) => {
     try {
       const newItem = {
         ...item,
         dataAtualizacao: Date.now(),
+        createdBy: profile?.name || 'Sistema',
         historico: [{
           statusAnterior: 'NOVO',
           statusNovo: item.status,
           data: Date.now(),
+          responsavel: profile?.name || 'Sistema',
+          responsavelUid: profile?.uid || '',
           detalhes: 'Item cadastrado no sistema'
         }]
       };
@@ -72,7 +75,7 @@ export const useStockStore = () => {
     }
   };
 
-  const updateStatus = async (id: string, newStatus: StockItem['status'], extras: Partial<StockItem>) => {
+  const updateStatus = async (id: string, newStatus: StockItem['status'], extras: Partial<StockItem>, profile: UserProfile | null) => {
     try {
       const item = stock.find(s => s.id === id);
       if (!item) return;
@@ -81,7 +84,8 @@ export const useStockStore = () => {
         statusAnterior: item.status,
         statusNovo: newStatus,
         data: Date.now(),
-        responsavel: extras.autorizadoPor || extras.responsavelManutencao || 'Sistema',
+        responsavel: profile?.name || extras.autorizadoPor || extras.responsavelManutencao || 'Sistema',
+        responsavelUid: profile?.uid || '',
         detalhes: extras.motivoManutencao || `Alteração de status para ${newStatus}`
       };
 
@@ -90,7 +94,8 @@ export const useStockStore = () => {
         ...extras,
         status: newStatus,
         historico: [historyEntry, ...item.historico],
-        dataAtualizacao: Date.now()
+        dataAtualizacao: Date.now(),
+        updatedBy: profile?.name || 'Sistema'
       });
     } catch (e) {
       console.error("Erro ao atualizar status:", e);
@@ -107,12 +112,13 @@ export const useStockStore = () => {
     }
   };
 
-  const editStockItem = async (id: string, updates: Partial<StockItem>) => {
+  const editStockItem = async (id: string, updates: Partial<StockItem>, profile: UserProfile | null) => {
     try {
       const itemRef = doc(db, 'stock', id);
       await updateDoc(itemRef, {
         ...updates,
-        dataAtualizacao: Date.now()
+        dataAtualizacao: Date.now(),
+        updatedBy: profile?.name || 'Sistema'
       });
     } catch (e) {
       console.error("Erro ao editar item:", e);

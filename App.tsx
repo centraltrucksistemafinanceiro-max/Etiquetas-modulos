@@ -63,7 +63,7 @@ const AppContent: React.FC = () => {
     }
 
     // Salvamos no histórico (Firebase agora gera o ID)
-    await saveToHistory();
+    await saveToHistory(profile);
     
     const printArea = document.querySelector('.print-area-content');
     if (!printArea) {

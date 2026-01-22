@@ -10,7 +10,7 @@ import {
   orderBy 
 } from 'firebase/firestore';
 import { db } from '../firebase';
-import { HistoryItem, LabelData, LabelSettings, StockItem } from '../types';
+import { HistoryItem, LabelData, LabelSettings, StockItem, UserProfile } from '../types';
 import { initialData, initialSettings } from '../constants/defaults';
 
 export const useLabelStore = () => {
@@ -92,11 +92,13 @@ export const useLabelStore = () => {
   };
 
   // Firebase Actions
-  const saveToHistory = async () => {
+  const saveToHistory = async (profile: UserProfile | null) => {
     try {
       const newItem = {
         ...data,
-        timestamp: Date.now()
+        timestamp: Date.now(),
+        createdBy: profile?.name || 'Sistema',
+        createdByEmail: profile?.email || ''
       };
       const docRef = await addDoc(collection(db, 'label_history'), newItem);
       setLastSavedId(docRef.id);
@@ -119,7 +121,6 @@ export const useLabelStore = () => {
   const clearHistory = async () => {
     if (confirm("Deseja realmente apagar todo o histórico de etiquetas do banco de dados?")) {
       try {
-        // We have to delete each document individually in a loop or batch
         for (const item of history) {
           await deleteDoc(doc(db, 'label_history', item.id));
         }
