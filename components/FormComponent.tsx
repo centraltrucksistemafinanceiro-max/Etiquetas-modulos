@@ -12,7 +12,7 @@ import { LabelData } from '../types';
 
 interface FormProps {
   data: LabelData;
-  onChange: (field: keyof LabelData, value: string) => void;
+  onChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
 }
 
 const FormComponent: React.FC<FormProps> = ({ data, onChange }) => {
@@ -38,10 +38,11 @@ const FormComponent: React.FC<FormProps> = ({ data, onChange }) => {
               </div>
               <input
                 id={field.id}
+                name={field.id}
                 type={field.type}
                 placeholder={field.placeholder}
                 value={data[field.id]}
-                onChange={(e) => onChange(field.id, e.target.value)}
+                onChange={onChange}
                 className="w-full pl-11 pr-4 py-3 text-sm bg-slate-950 border border-slate-800 rounded-[14px] outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500/50 transition-all font-medium text-white placeholder:text-slate-700 uppercase"
               />
             </div>
@@ -59,9 +60,10 @@ const FormComponent: React.FC<FormProps> = ({ data, onChange }) => {
           </div>
           <textarea
             id="observacao"
+            name="observacao"
             placeholder="Pressione ENTER para pular linhas..."
             value={data.observacao}
-            onChange={(e) => onChange('observacao', e.target.value)}
+            onChange={onChange}
             className="w-full pl-11 pr-4 py-3 text-sm bg-slate-950 border border-slate-800 rounded-[14px] outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500/50 transition-all font-medium text-white placeholder:text-slate-700 h-28 resize-none uppercase"
           />
         </div>
