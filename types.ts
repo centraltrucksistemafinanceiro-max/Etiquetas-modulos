@@ -57,3 +57,10 @@ export interface StockItem {
   historico: StockHistory[];
   dataAtualizacao: number;
 }
+
+export interface UserProfile {
+  uid: string;
+  email: string;
+  role: 'admin' | 'user';
+  name?: string;
+}

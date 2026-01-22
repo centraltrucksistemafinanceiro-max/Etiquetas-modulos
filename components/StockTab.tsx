@@ -21,9 +21,10 @@ import {
   Filter,
   Printer
 } from 'lucide-react';
-import { StockItem, StockHistory, StockConfig } from '../types';
+import { StockItem, StockHistory, StockConfig, UserProfile } from '../types';
 
 interface StockTabProps {
+  profile: UserProfile | null;
   stock: StockItem[];
   config: StockConfig;
   onAddItem: (item: Omit<StockItem, 'id' | 'dataAtualizacao' | 'historico'>) => void;
@@ -82,6 +83,7 @@ const Autocomplete: React.FC<{
 };
 
 const StockTab: React.FC<StockTabProps> = ({ 
+  profile,
   stock, 
   config,
   onAddItem, 
@@ -422,13 +424,15 @@ const StockTab: React.FC<StockTabProps> = ({
                         >
                           <HistoryIcon className="w-4 h-4" />
                         </button>
-                        <button 
-                          onClick={() => onDeleteItem(item.id)}
-                          className="p-2 text-slate-500 hover:text-red-500 transition-colors"
-                          title="Excluir"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </button>
+                        {profile?.role === 'admin' && (
+                          <button 
+                            onClick={() => onDeleteItem(item.id)}
+                            className="p-2 text-slate-500 hover:text-red-500 transition-colors"
+                            title="Excluir"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        )}
                       </div>
                     </td>
                   </tr>

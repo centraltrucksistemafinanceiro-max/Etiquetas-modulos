@@ -5,6 +5,7 @@ import { HistoryItem } from './types';
 import { initialSettings } from './constants/defaults';
 import { useLabelStore } from './hooks/useLabelStore';
 import { useStockStore } from './hooks/useStockStore';
+import { AuthProvider, useAuth } from './hooks/useAuth';
 import LabelComponent from './components/Label';
 import FormComponent from './components/FormComponent';
 import Header from './components/Header';
@@ -12,10 +13,13 @@ import SettingsPanel from './components/SettingsPanel';
 import PreviewSection from './components/PreviewSection';
 import ViewOnlyMode from './components/ViewOnlyMode';
 import StockTab from './components/StockTab';
+import Login from './components/Login';
+import UserManagement from './components/UserManagement';
 
-const App: React.FC = () => {
+const AppContent: React.FC = () => {
   const [showHistory, setShowHistory] = useState(false);
-  const [activeTab, setActiveTab] = useState<'labels' | 'stock'>('labels');
+  const [activeTab, setActiveTab] = useState<'labels' | 'stock' | 'users'>('labels');
+  const { user, profile, loading: authLoading } = useAuth();
   
   const {
     data,
@@ -23,6 +27,7 @@ const App: React.FC = () => {
     history,
     viewOnlyData,
     lastSavedId,
+    loading: labelLoading,
     handleInputChange,
     handleSettingChange,
     clearForm,
@@ -62,8 +67,24 @@ const App: React.FC = () => {
 
   const totalPrintWidth = (settings.width * 2) + settings.gap;
 
+  // View Only Mode (Public Access via QR Code)
   if (viewOnlyData) {
     return <ViewOnlyMode data={viewOnlyData} initialSettings={initialSettings} />;
+  }
+
+  // Loading state for initial AUTH check
+  if (authLoading) {
+    return (
+      <div className="min-h-screen bg-[#020617] flex flex-col items-center justify-center">
+        <div className="w-12 h-12 border-4 border-indigo-600/20 border-t-indigo-600 rounded-full animate-spin mb-4"></div>
+        <p className="text-slate-500 font-bold uppercase tracking-widest text-[10px]">Scania Inventory Cloud</p>
+      </div>
+    );
+  }
+
+  // Login Required for System Access
+  if (!user) {
+    return <Login />;
   }
 
   return (
@@ -128,8 +149,9 @@ const App: React.FC = () => {
               onDeleteHistoryItem={handleDeleteHistoryItem}
             />
           </div>
-        ) : (
+        ) : activeTab === 'stock' ? (
           <StockTab 
+            profile={profile}
             stock={stock}
             config={config}
             onAddItem={addStockItem}
@@ -139,6 +161,8 @@ const App: React.FC = () => {
             onAddType={addType}
             onAddFrequency={addFrequency}
           />
+        ) : (
+          profile?.role === 'admin' && <UserManagement />
         )}
       </main>
 
@@ -153,6 +177,14 @@ const App: React.FC = () => {
         </div>
       )}
     </div>
+  );
+};
+
+const App: React.FC = () => {
+  return (
+    <AuthProvider>
+      <AppContent />
+    </AuthProvider>
   );
 };
 
