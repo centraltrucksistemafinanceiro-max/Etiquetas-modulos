@@ -48,11 +48,58 @@ const AppContent: React.FC = () => {
   } = useStockStore();
 
   const handlePrint = async () => {
+    // Abrimos a janela IMEDIATAMENTE antes do await para evitar bloqueio de pop-up pelo navegador
+    const printWindow = window.open('', '_blank');
+    
+    if (!printWindow) {
+      alert("Por favor, habilite as janelas pop-up para permitir a impressão das etiquetas.");
+      return;
+    }
+
+    // Salvamos no histórico (Firebase agora gera o ID)
     await saveToHistory();
-    // Pequeno delay para garantir que o ID do Firebase foi propagado para o QR Code no DOM
-    setTimeout(() => {
-      window.print();
-    }, 500);
+    
+    const printArea = document.querySelector('.print-area-content');
+    if (!printArea) {
+      printWindow.close();
+      return;
+    }
+
+    printWindow.document.write(`
+      <html>
+        <head>
+          <title>Imprimir Etiquetas Scania</title>
+          <script src="https://cdn.tailwindcss.com"></script>
+          <style>
+            @page { 
+              size: ${totalPrintWidth}mm ${settings.height}mm; 
+              margin: 0; 
+            }
+            body { margin: 0; padding: 0; background: white; }
+            .print-container { 
+              display: flex; 
+              flex-direction: row; 
+              gap: ${settings.gap}mm; 
+              width: ${totalPrintWidth}mm;
+              padding: 0;
+            }
+          </style>
+        </head>
+        <body>
+          <div class="print-container">
+            ${printArea.innerHTML}
+          </div>
+          <script>
+            // Pequeno delay para renderização total (Tailwind + QR Code)
+            setTimeout(() => {
+              window.print();
+              setTimeout(() => window.close(), 500);
+            }, 1000);
+          </script>
+        </body>
+      </html>
+    `);
+    printWindow.document.close();
   };
 
   const handleLoadFromHistory = (item: HistoryItem) => {
@@ -89,24 +136,6 @@ const AppContent: React.FC = () => {
 
   return (
     <div className="min-h-screen flex flex-col antialiased bg-[#020617] text-slate-100">
-      <style>
-        {`
-          @media print {
-            @page {
-              size: ${totalPrintWidth}mm ${settings.height}mm;
-              margin: 0;
-            }
-            .print-area {
-              display: flex !important;
-              flex-direction: row !important;
-              gap: ${settings.gap}mm !important;
-              position: absolute !important;
-              top: 0 !important;
-              left: 0 !important;
-            }
-          }
-        `}
-      </style>
 
       <Header 
         onShowHistory={() => setShowHistory(!showHistory)} 
@@ -171,7 +200,7 @@ const AppContent: React.FC = () => {
       </footer>
 
       {activeTab === 'labels' && (
-        <div className="print-only print-area">
+        <div className="hidden print-area-content">
           <LabelComponent id={lastSavedId || undefined} data={data} type="main" settings={settings} isPrint />
           <LabelComponent id={lastSavedId || undefined} data={data} type="meta" settings={settings} isPrint />
         </div>
