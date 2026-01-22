@@ -1,92 +1,75 @@
 
 import { useState, useEffect } from 'react';
-import { LabelData, LabelSettings, HistoryItem } from '../types';
-import { initialData, initialSettings } from '../constants/defaults';
+import { 
+  collection, 
+  onSnapshot, 
+  addDoc, 
+  deleteDoc, 
+  doc, 
+  query, 
+  orderBy 
+} from 'firebase/firestore';
+import { db } from '../firebase';
+import { HistoryItem, LabelData } from '../types';
 
 export const useLabelStore = () => {
-  const [data, setData] = useState<LabelData>(initialData);
-  const [settings, setSettings] = useState<LabelSettings>(initialSettings);
   const [history, setHistory] = useState<HistoryItem[]>([]);
-  const [viewOnlyData, setViewOnlyData] = useState<LabelData | null>(null);
+  const [loading, setLoading] = useState(true);
 
+  // Sync Labels from Firebase
   useEffect(() => {
-    // Load data from URL
-    const params = new URLSearchParams(window.location.search);
-    const encodedData = params.get('v');
-    if (encodedData) {
-      try {
-        const decoded = JSON.parse(atob(encodedData));
-        setViewOnlyData(decoded);
-      } catch (e) {
-        console.error("Erro ao decodificar dados do QR Code", e);
-      }
-    }
+    const q = query(collection(db, 'label_history'), orderBy('timestamp', 'desc'));
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const items = snapshot.docs.map(doc => ({
+        ...doc.data(),
+        id: doc.id
+      })) as HistoryItem[];
+      setHistory(items);
+      setLoading(false);
+    });
 
-    // Load from LocalStorage
-    const savedHistory = localStorage.getItem('label_history');
-    if (savedHistory) {
-      try { setHistory(JSON.parse(savedHistory)); } catch (e) { console.error(e); }
-    }
-    const savedSettings = localStorage.getItem('label_settings');
-    if (savedSettings) {
-      try { 
-        const parsed = JSON.parse(savedSettings);
-        setSettings({ ...initialSettings, ...parsed }); 
-      } catch (e) { console.error(e); }
-    }
+    return () => unsubscribe();
   }, []);
 
-  useEffect(() => {
-    localStorage.setItem('label_history', JSON.stringify(history));
-  }, [history]);
-
-  useEffect(() => {
-    localStorage.setItem('label_settings', JSON.stringify(settings));
-  }, [settings]);
-
-  const handleInputChange = (field: keyof LabelData, value: string) => {
-    setData(prev => ({ ...prev, [field]: value.toUpperCase() }));
+  const addToHistory = async (data: LabelData) => {
+    try {
+      const newItem = {
+        ...data,
+        timestamp: Date.now()
+      };
+      await addDoc(collection(db, 'label_history'), newItem);
+    } catch (e) {
+      console.error("Erro ao salvar etiqueta:", e);
+    }
   };
 
-  const handleSettingChange = (field: keyof LabelSettings, value: number) => {
-    setSettings(prev => ({ ...prev, [field]: value }));
+  const deleteFromHistory = async (id: string) => {
+    try {
+      await deleteDoc(doc(db, 'label_history', id));
+    } catch (e) {
+      console.error("Erro ao deletar etiqueta:", e);
+    }
   };
 
-  const clearForm = () => {
-    setData({
-      ...initialData,
-      data: new Date().toISOString().split('T')[0]
-    });
-  };
-
-  const saveToHistory = () => {
-    const newItem: HistoryItem = {
-      ...data,
-      id: crypto.randomUUID(),
-      timestamp: Date.now()
-    };
-    setHistory(prev => [newItem, ...prev].slice(0, 20));
-  };
-
-  const loadFromHistory = (item: HistoryItem) => {
-    const { id, timestamp, ...rest } = item;
-    setData(rest);
-  };
-
-  const deleteHistoryItem = (id: string) => {
-    setHistory(prev => prev.filter(item => item.id !== id));
+  const clearHistory = async () => {
+    // Note: Firestore doesn't provide a single 'clear' call for collections. 
+    // You have to delete each document.
+    if (confirm("Deseja realmente apagar todo o histórico de etiquetas do banco de dados?")) {
+      try {
+        history.forEach(async (item) => {
+          await deleteDoc(doc(db, 'label_history', item.id));
+        });
+      } catch (e) {
+        console.error("Erro ao limpar histórico:", e);
+      }
+    }
   };
 
   return {
-    data,
-    settings,
     history,
-    viewOnlyData,
-    handleInputChange,
-    handleSettingChange,
-    clearForm,
-    saveToHistory,
-    loadFromHistory,
-    deleteHistoryItem
+    loading,
+    addToHistory,
+    deleteFromHistory,
+    clearHistory
   };
 };
