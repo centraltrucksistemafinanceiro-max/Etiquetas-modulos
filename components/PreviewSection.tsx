@@ -10,6 +10,7 @@ interface PreviewSectionProps {
   settings: LabelSettings;
   showHistory: boolean;
   history: HistoryItem[];
+  lastSavedId?: string;
   onCloseHistory: () => void;
   onLoadFromHistory: (item: HistoryItem) => void;
   onDeleteHistoryItem: (id: string, e: React.MouseEvent) => void;
@@ -20,6 +21,7 @@ const PreviewSection: React.FC<PreviewSectionProps> = ({
   settings, 
   showHistory, 
   history, 
+  lastSavedId,
   onCloseHistory, 
   onLoadFromHistory, 
   onDeleteHistoryItem 
@@ -49,8 +51,8 @@ const PreviewSection: React.FC<PreviewSectionProps> = ({
                   className="flex flex-row transition-all duration-300 ease-out origin-center" 
                   style={{ gap: `${settings.gap}mm` }}
                 >
-                  <LabelComponent data={data} type="main" settings={settings} />
-                  <LabelComponent data={data} type="meta" settings={settings} />
+                  <LabelComponent id={lastSavedId} data={data} type="main" settings={settings} />
+                  <LabelComponent id={lastSavedId} data={data} type="meta" settings={settings} />
                 </div>
               </Suspense>
            </div>

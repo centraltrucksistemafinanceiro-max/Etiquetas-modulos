@@ -22,6 +22,32 @@ export const useLabelStore = () => {
   // History State (Synced with Firebase)
   const [history, setHistory] = useState<HistoryItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const [lastSavedId, setLastSavedId] = useState<string | null>(null);
+
+  // Check URL for shared data or ID on mount
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const encodedData = params.get('v');
+    const docId = params.get('id');
+
+    if (docId) {
+      setLoading(true);
+      const docRef = doc(db, 'label_history', docId);
+      onSnapshot(docRef, (docSnap) => {
+        if (docSnap.exists()) {
+          setViewOnlyData(docSnap.data() as LabelData);
+        }
+        setLoading(false);
+      });
+    } else if (encodedData) {
+      try {
+        const decoded = JSON.parse(decodeURIComponent(escape(atob(encodedData))));
+        setViewOnlyData(decoded);
+      } catch (e) {
+        console.error("Erro ao decodificar dados da URL:", e);
+      }
+    }
+  }, []);
 
   // Sync History from Firebase
   useEffect(() => {
@@ -64,15 +90,19 @@ export const useLabelStore = () => {
         ...data,
         timestamp: Date.now()
       };
-      await addDoc(collection(db, 'label_history'), newItem);
+      const docRef = await addDoc(collection(db, 'label_history'), newItem);
+      setLastSavedId(docRef.id);
+      return docRef.id;
     } catch (e) {
       console.error("Erro ao salvar etiqueta no Firebase:", e);
+      return null;
     }
   };
 
   const deleteHistoryItem = async (id: string) => {
     try {
       await deleteDoc(doc(db, 'label_history', id));
+      if (lastSavedId === id) setLastSavedId(null);
     } catch (e) {
       console.error("Erro ao deletar etiqueta do Firebase:", e);
     }
@@ -85,6 +115,7 @@ export const useLabelStore = () => {
         for (const item of history) {
           await deleteDoc(doc(db, 'label_history', item.id));
         }
+        setLastSavedId(null);
       } catch (e) {
         console.error("Erro ao limpar histórico:", e);
       }
@@ -97,6 +128,7 @@ export const useLabelStore = () => {
     history,
     loading,
     viewOnlyData,
+    lastSavedId,
     handleInputChange,
     handleSettingChange,
     clearForm,

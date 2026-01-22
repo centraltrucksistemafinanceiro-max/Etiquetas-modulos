@@ -22,6 +22,7 @@ const App: React.FC = () => {
     settings,
     history,
     viewOnlyData,
+    lastSavedId,
     handleInputChange,
     handleSettingChange,
     clearForm,
@@ -41,9 +42,12 @@ const App: React.FC = () => {
     addFrequency
   } = useStockStore();
 
-  const handlePrint = () => {
-    saveToHistory();
-    window.print();
+  const handlePrint = async () => {
+    await saveToHistory();
+    // Pequeno delay para garantir que o ID do Firebase foi propagado para o QR Code no DOM
+    setTimeout(() => {
+      window.print();
+    }, 500);
   };
 
   const handleLoadFromHistory = (item: HistoryItem) => {
@@ -118,6 +122,7 @@ const App: React.FC = () => {
               settings={settings} 
               showHistory={showHistory} 
               history={history}
+              lastSavedId={lastSavedId || undefined}
               onCloseHistory={() => setShowHistory(false)}
               onLoadFromHistory={handleLoadFromHistory}
               onDeleteHistoryItem={handleDeleteHistoryItem}
@@ -143,8 +148,8 @@ const App: React.FC = () => {
 
       {activeTab === 'labels' && (
         <div className="print-only print-area">
-          <LabelComponent data={data} type="main" settings={settings} isPrint />
-          <LabelComponent data={data} type="meta" settings={settings} isPrint />
+          <LabelComponent id={lastSavedId || undefined} data={data} type="main" settings={settings} isPrint />
+          <LabelComponent id={lastSavedId || undefined} data={data} type="meta" settings={settings} isPrint />
         </div>
       )}
     </div>

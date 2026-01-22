@@ -4,19 +4,24 @@ import { QRCodeSVG } from 'qrcode.react';
 import { LabelData, LabelSettings } from '../types';
 
 interface LabelProps {
+  id?: string;
   data: LabelData;
   type: 'main' | 'meta';
   settings: LabelSettings;
   isPrint?: boolean;
 }
 
-const LabelComponent: React.FC<LabelProps> = ({ data, type, settings, isPrint }) => {
+const LabelComponent: React.FC<LabelProps> = ({ id, data, type, settings, isPrint }) => {
   const generateQRValue = () => {
     try {
-      const dataString = JSON.stringify(data);
-      const encoded = btoa(unescape(encodeURIComponent(dataString)));
-      const url = new URL(window.location.href);
-      url.searchParams.set('v', encoded);
+      const url = new URL(window.location.origin);
+      if (id) {
+        url.searchParams.set('id', id);
+      } else {
+        const dataString = JSON.stringify(data);
+        const encoded = btoa(unescape(encodeURIComponent(dataString)));
+        url.searchParams.set('v', encoded);
+      }
       return url.toString();
     } catch (e) {
       return `CLIENTE: ${data.cliente || '-'}\nOS: ${data.os || '-'}\nPLACA: ${data.placa || '-'}`;
