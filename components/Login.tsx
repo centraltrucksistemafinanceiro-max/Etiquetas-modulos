@@ -2,15 +2,13 @@
 import React, { useState } from 'react';
 import { 
   signInWithEmailAndPassword, 
-  createUserWithEmailAndPassword,
   browserLocalPersistence,
   setPersistence 
 } from 'firebase/auth';
 import { auth } from '../firebase';
-import { Cpu, Mail, Lock, LogIn, UserPlus, AlertCircle } from 'lucide-react';
+import { Cpu, Mail, Lock, LogIn, AlertCircle } from 'lucide-react';
 
 const Login: React.FC = () => {
-  const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -23,21 +21,13 @@ const Login: React.FC = () => {
 
     try {
       await setPersistence(auth, browserLocalPersistence);
-      if (isLogin) {
-        await signInWithEmailAndPassword(auth, email, password);
-      } else {
-        await createUserWithEmailAndPassword(auth, email, password);
-      }
+      await signInWithEmailAndPassword(auth, email, password);
     } catch (err: any) {
       console.error(err);
-      if (err.code === 'auth/user-not-found' || err.code === 'auth/wrong-password') {
+      if (err.code === 'auth/user-not-found' || err.code === 'auth/wrong-password' || err.code === 'auth/invalid-credential') {
         setError('E-mail ou senha incorretos.');
-      } else if (err.code === 'auth/email-already-in-use') {
-        setError('Este e-mail já está em uso.');
-      } else if (err.code === 'auth/weak-password') {
-        setError('A senha deve ter pelo menos 6 caracteres.');
       } else {
-        setError('Ocorreu um erro ao tentar realizar o acesso.');
+        setError('Ocorreu um erro ao tentar realizar o acesso técnico.');
       }
     } finally {
       setLoading(false);
@@ -57,10 +47,10 @@ const Login: React.FC = () => {
               <Cpu className="w-10 h-10 text-white" />
             </div>
             <h1 className="text-3xl font-black text-white tracking-tight">
-              {isLogin ? 'Bem-vindo' : 'Criar Conta'}
+              Acesso Restrito
             </h1>
             <p className="text-slate-400 text-sm mt-2">
-              {isLogin ? 'Sistema de Gestão Scania' : 'Registre-se para acessar o inventário'}
+              Somente pessoal autorizado Scania
             </p>
           </div>
 
@@ -73,7 +63,7 @@ const Login: React.FC = () => {
             )}
 
             <div className="space-y-2">
-              <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">E-mail</label>
+              <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">E-mail Corporativo</label>
               <div className="relative">
                 <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
                 <input 
@@ -82,13 +72,13 @@ const Login: React.FC = () => {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   className="w-full pl-12 pr-4 py-4 bg-slate-950 border border-slate-800 rounded-2xl text-white text-sm focus:border-indigo-500 outline-none transition-all"
-                  placeholder="admin@scania.com"
+                  placeholder="usuario@scania.com"
                 />
               </div>
             </div>
 
             <div className="space-y-2">
-              <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Senha</label>
+              <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Senha de Acesso</label>
               <div className="relative">
                 <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
                 <input 
@@ -111,25 +101,16 @@ const Login: React.FC = () => {
                 <div className="w-5 h-5 border-2 border-white/20 border-t-white rounded-full animate-spin"></div>
               ) : (
                 <>
-                  {isLogin ? <LogIn className="w-5 h-5" /> : <UserPlus className="w-5 h-5" />}
-                  {isLogin ? 'Entrar no Sistema' : 'Cadastrar agora'}
+                  <LogIn className="w-5 h-5" />
+                  Entrar no Sistema
                 </>
               )}
             </button>
           </form>
-
-          <div className="mt-8 pt-8 border-t border-slate-800 text-center">
-            <button 
-              onClick={() => setIsLogin(!isLogin)}
-              className="text-sm text-slate-400 hover:text-white transition-colors"
-            >
-              {isLogin ? 'Ainda não tem conta? Clique aqui' : 'Já possui conta? Faça o login'}
-            </button>
-          </div>
         </div>
 
         <p className="text-center mt-10 text-[10px] text-slate-600 font-bold uppercase tracking-widest">
-            Scania Inventory & Label Cloud Management
+            Scania Inventory & Label Cloud Management - V1.2
         </p>
       </div>
     </div>
