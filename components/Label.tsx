@@ -78,33 +78,36 @@ const LabelComponent: React.FC<LabelProps> = ({ id, data, type, settings, isPrin
         <div style={headerStyle}>
           {data.cliente || '-'}
         </div>
-        <div style={{ textTransform: 'uppercase', display: 'flex', justifyContent: 'space-between', gap: '2mm' }}>
+        <div style={{ textTransform: 'uppercase', display: 'flex', justifyContent: 'space-between', gap: '1mm', marginBottom: '0.5mm' }}>
           <span style={{ flexShrink: 0 }}>O.S:</span> 
           <span style={{ textAlign: 'right', wordBreak: 'break-all' }}>{data.os || '-'}</span>
         </div>
-        <div style={{ textTransform: 'uppercase', display: 'flex', justifyContent: 'space-between', gap: '2mm' }}>
+        <div style={{ textTransform: 'uppercase', display: 'flex', justifyContent: 'space-between', gap: '1mm', marginBottom: '0.5mm' }}>
           <span style={{ flexShrink: 0 }}>PLACA:</span> 
           <span style={{ textAlign: 'right', wordBreak: 'break-all' }}>{data.placa || '-'}</span>
         </div>
-        <div style={{ textTransform: 'uppercase', display: 'flex', justifyContent: 'space-between', gap: '2mm' }}>
-          <span style={{ flexShrink: 0 }}>FROTA:</span> 
+        <div style={{ textTransform: 'uppercase', display: 'flex', justifyContent: 'space-between', gap: '1mm', marginBottom: '0.5mm' }}>
+          <span style={{ flexShrink: 0 }}>ID/SN:</span> 
           <span style={{ textAlign: 'right', wordBreak: 'break-all' }}>{data.frota || '-'}</span>
         </div>
         
-        <div style={{ flex: 1 }}></div>
         
         <div style={{ 
           display: 'flex', 
           justifyContent: 'center', 
           alignItems: 'center',
-          paddingTop: '1mm',
+          paddingTop: '2mm', // Aumentado um pouco
           width: '100%'
         }}>
           <QRCodeSVG 
             value={qrValue} 
             size={qrSizePx}
-            level="L"
-            includeMargin={false}
+            level="M" // Mudado de L para M (melhor correção de erro)
+            includeMargin={true} // Adiciona margem branca para facilitar a leitura por câmeras
+            style={{ 
+              backgroundColor: 'white',
+              imageRendering: 'crisp-edges'
+            }}
           />
         </div>
       </div>
