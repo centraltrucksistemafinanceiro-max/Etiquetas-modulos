@@ -4,15 +4,19 @@ import { FileText, RefreshCcw } from 'lucide-react';
 import { HistoryItem } from './types';
 import { initialSettings } from './constants/defaults';
 import { useLabelStore } from './hooks/useLabelStore';
+import { useStockStore } from './hooks/useStockStore';
 import LabelComponent from './components/Label';
 import FormComponent from './components/FormComponent';
 import Header from './components/Header';
 import SettingsPanel from './components/SettingsPanel';
 import PreviewSection from './components/PreviewSection';
 import ViewOnlyMode from './components/ViewOnlyMode';
+import StockTab from './components/StockTab';
 
 const App: React.FC = () => {
   const [showHistory, setShowHistory] = useState(false);
+  const [activeTab, setActiveTab] = useState<'labels' | 'stock'>('labels');
+  
   const {
     data,
     settings,
@@ -25,6 +29,17 @@ const App: React.FC = () => {
     loadFromHistory,
     deleteHistoryItem
   } = useLabelStore();
+
+  const {
+    stock,
+    config,
+    addStockItem,
+    updateStatus,
+    deleteStockItem,
+    editStockItem,
+    addType,
+    addFrequency
+  } = useStockStore();
 
   const handlePrint = () => {
     saveToHistory();
@@ -71,48 +86,67 @@ const App: React.FC = () => {
       <Header 
         onShowHistory={() => setShowHistory(!showHistory)} 
         onPrint={handlePrint} 
-        showHistory={showHistory} 
+        showHistory={showHistory}
+        activeTab={activeTab}
+        onTabChange={setActiveTab}
       />
 
-      <main className="flex-1 w-full max-w-7xl mx-auto p-6 md:p-8 grid grid-cols-1 lg:grid-cols-12 gap-8 no-print">
-        <div className="lg:col-span-5 space-y-6">
-          <div className="bg-slate-900/50 rounded-[24px] shadow-sm border border-slate-800 overflow-hidden">
-            <div className="px-6 py-5 border-b border-slate-800 flex justify-between items-center bg-slate-900/80">
-              <h2 className="font-bold text-white flex items-center gap-2">
-                <FileText className="w-4 h-4 text-indigo-400" />
-                Dados do Serviço
-              </h2>
-              <button onClick={clearForm} className="p-2 text-slate-500 hover:text-indigo-400 transition-colors">
-                <RefreshCcw className="w-4 h-4" />
-              </button>
+      <main className="flex-1 w-full max-w-7xl mx-auto p-6 md:p-8 no-print">
+        {activeTab === 'labels' ? (
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+            <div className="lg:col-span-5 space-y-6">
+              <div className="bg-slate-900/50 rounded-[24px] shadow-sm border border-slate-800 overflow-hidden">
+                <div className="px-6 py-5 border-b border-slate-800 flex justify-between items-center bg-slate-900/80">
+                  <h2 className="font-bold text-white flex items-center gap-2">
+                    <FileText className="w-4 h-4 text-indigo-400" />
+                    Dados do Serviço
+                  </h2>
+                  <button onClick={clearForm} className="p-2 text-slate-500 hover:text-indigo-400 transition-colors">
+                    <RefreshCcw className="w-4 h-4" />
+                  </button>
+                </div>
+                <div className="p-6">
+                  <FormComponent data={data} onChange={handleInputChange} />
+                </div>
+              </div>
+
+              <SettingsPanel settings={settings} onChange={handleSettingChange} />
             </div>
-            <div className="p-6">
-              <FormComponent data={data} onChange={handleInputChange} />
-            </div>
+
+            <PreviewSection 
+              data={data} 
+              settings={settings} 
+              showHistory={showHistory} 
+              history={history}
+              onCloseHistory={() => setShowHistory(false)}
+              onLoadFromHistory={handleLoadFromHistory}
+              onDeleteHistoryItem={handleDeleteHistoryItem}
+            />
           </div>
-
-          <SettingsPanel settings={settings} onChange={handleSettingChange} />
-        </div>
-
-        <PreviewSection 
-          data={data} 
-          settings={settings} 
-          showHistory={showHistory} 
-          history={history}
-          onCloseHistory={() => setShowHistory(false)}
-          onLoadFromHistory={handleLoadFromHistory}
-          onDeleteHistoryItem={handleDeleteHistoryItem}
-        />
+        ) : (
+          <StockTab 
+            stock={stock}
+            config={config}
+            onAddItem={addStockItem}
+            updateStatus={updateStatus}
+            onDeleteItem={deleteStockItem}
+            onEditItem={editStockItem}
+            onAddType={addType}
+            onAddFrequency={addFrequency}
+          />
+        )}
       </main>
 
       <footer className="no-print py-8 border-t border-slate-900 text-center">
         <p className="text-[10px] font-bold text-slate-600 uppercase tracking-[0.2em]">Designed for High Precision Industrial Printing</p>
       </footer>
 
-      <div className="print-only print-area">
-        <LabelComponent data={data} type="main" settings={settings} isPrint />
-        <LabelComponent data={data} type="meta" settings={settings} isPrint />
-      </div>
+      {activeTab === 'labels' && (
+        <div className="print-only print-area">
+          <LabelComponent data={data} type="main" settings={settings} isPrint />
+          <LabelComponent data={data} type="meta" settings={settings} isPrint />
+        </div>
+      )}
     </div>
   );
 };

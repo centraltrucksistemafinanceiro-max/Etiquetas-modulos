@@ -22,3 +22,38 @@ export interface HistoryItem extends LabelData {
   id: string;
   timestamp: number;
 }
+
+export interface StockHistory {
+  statusAnterior: string;
+  statusNovo: string;
+  data: number;
+  responsavel?: string;
+  detalhes?: string;
+}
+
+export interface StockConfig {
+  tipos: string[];
+  frequencias: string[];
+}
+
+export interface StockItem {
+  id: string;
+  descricao: string;
+  tipo: string;
+  frequencia: string;
+  aplicacao: string;
+  serial: string;
+  quantidade: number;
+  status: 'Em Estoque' | 'Emprestado' | 'Em Manutenção';
+  
+  // Campos Dinâmicos
+  localAtual?: string;
+  autorizadoPor?: string;
+  responsavelManutencao?: string;
+  motivoManutencao?: string;
+  dataSaida?: string;
+  previsaoRetorno?: string;
+  
+  historico: StockHistory[];
+  dataAtualizacao: number;
+}
