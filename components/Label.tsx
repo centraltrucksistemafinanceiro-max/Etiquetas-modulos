@@ -33,7 +33,9 @@ const LabelComponent: React.FC<LabelProps> = ({ id, data, type, settings, isPrin
   const labelStyle: React.CSSProperties = {
     width: `${settings.width}mm`,
     height: `${settings.height}mm`,
-    padding: '2mm',
+    paddingLeft: '2mm',
+    paddingRight: '2mm',
+    paddingBottom: '2mm',
     paddingTop: `${settings.paddingTop}mm`,
     boxSizing: 'border-box',
     display: 'flex',
@@ -53,18 +55,18 @@ const LabelComponent: React.FC<LabelProps> = ({ id, data, type, settings, isPrin
   };
 
   const headerStyle: React.CSSProperties = {
-    fontSize: '105%', 
+    fontSize: '110%', 
     textTransform: 'uppercase', 
     fontWeight: '900',
     borderBottom: '0.4mm solid #000',
-    marginBottom: '1mm',
-    paddingBottom: '0.5mm',
+    marginBottom: '1.5mm',
+    paddingBottom: '0.8mm',
+    paddingTop: '0.8mm', // Espaço extra no topo e base para evitar cortes
     width: '100%',
-    lineHeight: '1',
+    lineHeight: '1.2',
     textAlign: 'center',
     display: 'block',
-    wordBreak: 'break-word',
-    overflow: 'hidden'
+    wordBreak: 'break-word'
   };
 
   if (type === 'main') {
