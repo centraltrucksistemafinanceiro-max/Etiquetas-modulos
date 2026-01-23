@@ -53,18 +53,18 @@ const LabelComponent: React.FC<LabelProps> = ({ id, data, type, settings, isPrin
   };
 
   const headerStyle: React.CSSProperties = {
-    fontSize: '110%', 
+    fontSize: '105%', 
     textTransform: 'uppercase', 
-    wordBreak: 'break-all', 
-    display: '-webkit-box', 
-    WebkitLineClamp: 2, 
-    WebkitBoxOrient: 'vertical', 
-    overflow: 'hidden',
+    fontWeight: '900',
+    borderBottom: '0.4mm solid #000',
     marginBottom: '1mm',
-    borderBottom: '0.2mm solid #000',
     paddingBottom: '0.5mm',
     width: '100%',
-    lineHeight: '1.1'
+    lineHeight: '1',
+    textAlign: 'center',
+    display: 'block',
+    wordBreak: 'break-word',
+    overflow: 'hidden'
   };
 
   if (type === 'main') {
@@ -90,57 +90,54 @@ const LabelComponent: React.FC<LabelProps> = ({ id, data, type, settings, isPrin
           <span style={{ flexShrink: 0 }}>ID/SN:</span> 
           <span style={{ textAlign: 'right', wordBreak: 'break-all' }}>{data.frota || '-'}</span>
         </div>
-        
-        {id && (
-          <div style={{ textTransform: 'uppercase', fontSize: '7px', color: '#666', marginTop: '-0.5mm', marginBottom: '0.5mm', textAlign: 'center' }}>
-            DOC ID: {id}
-          </div>
-        )}
+
         <div style={{ 
           display: 'flex', 
           flexDirection: 'column',
           justifyContent: 'center', 
           alignItems: 'center',
-          paddingTop: '1mm',
+          paddingTop: '0.5mm',
           width: '100%'
         }}>
           <StyledQRCode 
             value={qrValue} 
             size={qrSizePx}
-            logo="/icon.png"
           />
           
           <div style={{ 
-            marginTop: '0.5mm', 
+            marginTop: '1mm', 
             textAlign: 'center', 
             width: '100%',
-            lineHeight: '1.2'
+            lineHeight: '1'
           }}>
             <div style={{ 
-              color: '#00B4D8', 
-              fontSize: '10px', 
+              color: 'black', 
+              fontSize: '9px', 
               fontWeight: '900',
-              letterSpacing: '0.5px',
               textTransform: 'uppercase'
             }}>
               Central Truck
             </div>
             <div style={{ 
-              color: '#FB8500', 
-              fontSize: '6px', 
+              color: 'black', 
+              fontSize: '5px', 
               fontWeight: '700',
-              textTransform: 'uppercase',
-              marginTop: '-1px'
+              textTransform: 'uppercase'
             }}>
               Sistema Financeiro
             </div>
-            <div style={{ 
-              fontSize: '8px', 
-              fontWeight: '800',
-              marginTop: '1px'
-            }}>
-              {data.frota || '-'}
-            </div>
+            {data.shortId && (
+              <div style={{ 
+                fontSize: '10px', 
+                fontWeight: '900',
+                marginTop: '1.5mm',
+                border: '0.3mm solid black',
+                padding: '0.2mm 2mm',
+                display: 'inline-block'
+              }}>
+                #{data.shortId}
+              </div>
+            )}
           </div>
         </div>
       </div>

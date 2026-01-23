@@ -32,23 +32,22 @@ const StyledQRCode: React.FC<StyledQRCodeProps> = ({ value, size, logo }) => {
     imageOptions: {
       hideBackgroundDots: true,
       imageSize: 0.4,
-      margin: 2,
-      crossOrigin: 'anonymous',
+      margin: 0,
     },
     dotsOptions: {
       color: '#000000',
-      type: 'dots' as DotType
+      type: 'square' as DotType
     },
     backgroundOptions: {
       color: '#ffffff',
     },
     cornersSquareOptions: {
       color: '#000000',
-      type: 'extra-rounded' as CornerSquareType
+      type: 'square' as CornerSquareType
     },
     cornersDotOptions: {
       color: '#000000',
-      type: 'dot' as CornerDotType
+      type: 'square' as CornerDotType
     }
   }));
 
