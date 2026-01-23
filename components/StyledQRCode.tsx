@@ -23,11 +23,11 @@ const StyledQRCode: React.FC<StyledQRCodeProps> = ({ value, size, logo }) => {
     height: size,
     type: 'svg' as DrawType,
     data: value,
-    margin: 4,
+    margin: 0,
     qrOptions: {
       typeNumber: 0 as TypeNumber,
       mode: 'Byte' as Mode,
-      errorCorrectionLevel: 'M' as ErrorCorrectionLevel
+      errorCorrectionLevel: 'L' as ErrorCorrectionLevel
     },
     imageOptions: {
       hideBackgroundDots: true,

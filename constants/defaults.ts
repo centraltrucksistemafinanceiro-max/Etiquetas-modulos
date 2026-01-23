@@ -18,5 +18,5 @@ export const initialSettings: LabelSettings = {
   paddingTop: 3,
   lineSpacing: 1.2,
   fontSize: 11,
-  qrSize: 55
+  qrSize: 48
 };
