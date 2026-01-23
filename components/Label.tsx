@@ -172,4 +172,4 @@ const LabelComponent: React.FC<LabelProps> = ({ id, data, type, settings, isPrin
   );
 };
 
-export default LabelComponent;
+export default React.memo(LabelComponent);

@@ -1,6 +1,5 @@
-
 import { initializeApp } from "firebase/app";
-import { getFirestore } from "firebase/firestore";
+import { getFirestore, enableIndexedDbPersistence } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
 
 const firebaseConfig = {
@@ -15,3 +14,14 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 export const db = getFirestore(app);
 export const auth = getAuth(app);
+
+// Habilita persistência offline para carregar o sistema instantaneamente em visitas repetidas
+if (typeof window !== 'undefined') {
+  enableIndexedDbPersistence(db).catch((err) => {
+    if (err.code === 'failed-precondition') {
+      console.warn("Múltiplas abas abertas, persistência habilitada apenas na primeira.");
+    } else if (err.code === 'unimplemented') {
+      console.warn("O navegador não suporta persistência offline.");
+    }
+  });
+}

@@ -11,10 +11,19 @@ import FormComponent from './components/FormComponent';
 import Header from './components/Header';
 import SettingsPanel from './components/SettingsPanel';
 import PreviewSection from './components/PreviewSection';
-import ViewOnlyMode from './components/ViewOnlyMode';
-import StockTab from './components/StockTab';
 import Login from './components/Login';
-import UserManagement from './components/UserManagement';
+
+// Importação dinâmica (Lazy Loading) para componentes pesados
+// Isso reduz o tamanho do download inicial
+const StockTab = React.lazy(() => import('./components/StockTab'));
+const UserManagement = React.lazy(() => import('./components/UserManagement'));
+const ViewOnlyMode = React.lazy(() => import('./components/ViewOnlyMode'));
+
+const LoadingFallback = () => (
+  <div className="min-h-screen bg-[#020617] flex flex-col items-center justify-center">
+    <div className="w-12 h-12 border-4 border-indigo-600/20 border-t-indigo-600 rounded-full animate-spin mb-4"></div>
+  </div>
+);
 
 const AppContent: React.FC = () => {
   const [showHistory, setShowHistory] = useState(false);
@@ -132,7 +141,11 @@ const AppContent: React.FC = () => {
 
   // 2. Modo Visualização (Acesso Público via QR Code)
   if (viewOnlyData) {
-    return <ViewOnlyMode data={viewOnlyData} initialSettings={initialSettings} />;
+    return (
+      <React.Suspense fallback={<LoadingFallback />}>
+        <ViewOnlyMode data={viewOnlyData} initialSettings={initialSettings} />
+      </React.Suspense>
+    );
   }
 
   // 3. Se não está logado, vai para Login imediatamente
@@ -142,12 +155,7 @@ const AppContent: React.FC = () => {
 
   // 4. Se logado, espera carregar os dados específicos (Histórico, etc)
   if (labelLoading) {
-    return (
-      <div className="min-h-screen bg-[#020617] flex flex-col items-center justify-center">
-        <div className="w-12 h-12 border-4 border-indigo-600/20 border-t-indigo-600 rounded-full animate-spin mb-4"></div>
-        <p className="text-slate-500 font-bold uppercase tracking-widest text-[10px]">Carregando histórico...</p>
-      </div>
-    );
+    return <LoadingFallback />;
   }
 
   return (
@@ -200,19 +208,25 @@ const AppContent: React.FC = () => {
             />
           </div>
         ) : activeTab === 'stock' ? (
-          <StockTab 
-            profile={profile}
-            stock={stock}
-            config={config}
-            onAddItem={addStockItem}
-            updateStatus={updateStatus}
-            onDeleteItem={deleteStockItem}
-            onEditItem={editStockItem}
-            onAddType={addType}
-            onAddFrequency={addFrequency}
-          />
+          <React.Suspense fallback={<LoadingFallback />}>
+            <StockTab 
+              profile={profile}
+              stock={stock}
+              config={config}
+              onAddItem={addStockItem}
+              updateStatus={updateStatus}
+              onDeleteItem={deleteStockItem}
+              onEditItem={editStockItem}
+              onAddType={addType}
+              onAddFrequency={addFrequency}
+            />
+          </React.Suspense>
         ) : (
-          profile?.role === 'admin' && <UserManagement />
+          profile?.role === 'admin' && (
+            <React.Suspense fallback={<LoadingFallback />}>
+              <UserManagement />
+            </React.Suspense>
+          )
         )}
       </main>
 
