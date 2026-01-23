@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { QRCodeSVG } from 'qrcode.react';
+import StyledQRCode from './StyledQRCode';
 import { LabelData, LabelSettings } from '../types';
 
 interface LabelProps {
@@ -91,24 +91,57 @@ const LabelComponent: React.FC<LabelProps> = ({ id, data, type, settings, isPrin
           <span style={{ textAlign: 'right', wordBreak: 'break-all' }}>{data.frota || '-'}</span>
         </div>
         
-        
+        {id && (
+          <div style={{ textTransform: 'uppercase', fontSize: '7px', color: '#666', marginTop: '-0.5mm', marginBottom: '0.5mm', textAlign: 'center' }}>
+            DOC ID: {id}
+          </div>
+        )}
         <div style={{ 
           display: 'flex', 
+          flexDirection: 'column',
           justifyContent: 'center', 
           alignItems: 'center',
-          paddingTop: '2mm', // Aumentado um pouco
+          paddingTop: '1mm',
           width: '100%'
         }}>
-          <QRCodeSVG 
+          <StyledQRCode 
             value={qrValue} 
             size={qrSizePx}
-            level="M" // Mudado de L para M (melhor correção de erro)
-            includeMargin={true} // Adiciona margem branca para facilitar a leitura por câmeras
-            style={{ 
-              backgroundColor: 'white',
-              imageRendering: 'crisp-edges'
-            }}
+            logo="/icon.png"
           />
+          
+          <div style={{ 
+            marginTop: '0.5mm', 
+            textAlign: 'center', 
+            width: '100%',
+            lineHeight: '1.2'
+          }}>
+            <div style={{ 
+              color: '#00B4D8', 
+              fontSize: '10px', 
+              fontWeight: '900',
+              letterSpacing: '0.5px',
+              textTransform: 'uppercase'
+            }}>
+              Central Truck
+            </div>
+            <div style={{ 
+              color: '#FB8500', 
+              fontSize: '6px', 
+              fontWeight: '700',
+              textTransform: 'uppercase',
+              marginTop: '-1px'
+            }}>
+              Sistema Financeiro
+            </div>
+            <div style={{ 
+              fontSize: '8px', 
+              fontWeight: '800',
+              marginTop: '1px'
+            }}>
+              {data.frota || '-'}
+            </div>
+          </div>
         </div>
       </div>
     );

@@ -84,9 +84,11 @@ export const useStockStore = () => {
         statusAnterior: item.status,
         statusNovo: newStatus,
         data: Date.now(),
-        responsavel: profile?.name || extras.autorizadoPor || extras.responsavelManutencao || 'Sistema',
+        responsavel: profile?.name || extras.mecanicoTeste || extras.autorizadoPor || extras.responsavelManutencao || 'Sistema',
         responsavelUid: profile?.uid || '',
-        detalhes: extras.motivoManutencao || `Alteração de status para ${newStatus}`
+        detalhes: newStatus === 'Em Teste' 
+          ? `Mecânico: ${extras.mecanicoTeste} | O.S: ${extras.osTeste}` 
+          : extras.motivoManutencao || `Alteração de status para ${newStatus}`
       };
 
       const itemRef = doc(db, 'stock', id);

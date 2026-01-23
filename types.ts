@@ -8,6 +8,7 @@ export interface LabelData {
   observacao: string;
   stockItemId?: string;
   createdBy?: string; // Nome do usuário que criou
+  shortId?: string; // ID único amigável (ex: AB12CD)
 }
 
 export interface LabelSettings {
@@ -48,13 +49,16 @@ export interface StockItem {
   aplicacao: string;
   serial: string;
   quantidade: number;
-  status: 'Em Estoque' | 'Emprestado' | 'Em Manutenção';
+  status: 'Em Estoque' | 'Emprestado' | 'Em Manutenção' | 'Em Teste';
   
   // Campos Dinâmicos
   localAtual?: string;
   autorizadoPor?: string;
   responsavelManutencao?: string;
   motivoManutencao?: string;
+  mecanicoTeste?: string;
+  autorizadoTeste?: string;
+  osTeste?: string;
   dataSaida?: string;
   previsaoRetorno?: string;
   

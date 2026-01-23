@@ -41,6 +41,9 @@ const HistoryPanel: React.FC<HistoryPanelProps> = ({ history, onClose, onLoad, o
                 <div className="flex items-center gap-2 mb-1">
                   <h3 className="text-sm font-bold text-slate-100 truncate">{item.cliente || 'SEM NOME'}</h3>
                   <span className="px-2 py-0.5 bg-slate-800 text-[8px] font-black text-slate-500 rounded-md uppercase">OS: {item.os}</span>
+                  {item.shortId && (
+                    <span className="px-2 py-0.5 bg-indigo-900/40 text-[8px] font-black text-indigo-400 rounded-md uppercase">#{item.shortId}</span>
+                  )}
                 </div>
                 <div className="flex flex-wrap items-center gap-x-4 gap-y-1">
                   <span className="text-[9px] font-bold text-slate-500 uppercase flex items-center gap-1">

@@ -87,15 +87,17 @@ export const useLabelStore = () => {
   };
 
   const loadFromHistory = (item: HistoryItem) => {
-    const { id, timestamp, ...labelData } = item;
+    const { id, timestamp, shortId, ...labelData } = item;
     setData(labelData);
   };
 
   // Firebase Actions
   const saveToHistory = async (profile: UserProfile | null) => {
     try {
+      const shortId = Math.random().toString(36).substring(2, 8).toUpperCase();
       const newItem = {
         ...data,
+        shortId,
         timestamp: Date.now(),
         createdBy: profile?.name || 'Sistema',
         createdByEmail: profile?.email || ''

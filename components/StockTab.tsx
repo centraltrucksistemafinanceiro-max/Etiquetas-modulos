@@ -101,7 +101,9 @@ const StockTab: React.FC<StockTabProps> = ({
   const [formData, setFormData] = useState<Omit<StockItem, 'id' | 'dataAtualizacao' | 'historico'>>({
     descricao: '', tipo: config.tipos[0] || 'Outros', frequencia: config.frequencias[0] || 'Outra',
     aplicacao: '', serial: '', quantidade: 1, status: 'Em Estoque', localAtual: '',
-    autorizadoPor: '', responsavelManutencao: '', motivoManutencao: '', dataSaida: '', previsaoRetorno: ''
+    autorizadoPor: '', responsavelManutencao: '', motivoManutencao: '', 
+    mecanicoTeste: '', autorizadoTeste: '', osTeste: '',
+    dataSaida: '', previsaoRetorno: ''
   });
 
   const [actionData, setActionData] = useState<Partial<StockItem>>({});
@@ -110,7 +112,12 @@ const StockTab: React.FC<StockTabProps> = ({
     descricoes: Array.from(new Set(stock.map(s => s.descricao))),
     aplicacoes: Array.from(new Set(stock.map(s => s.aplicacao))),
     locais: Array.from(new Set(stock.map(s => s.localAtual || ''))).filter(Boolean),
-    responsaveis: Array.from(new Set([...stock.map(s => s.autorizadoPor || ''), ...stock.map(s => s.responsavelManutencao || '')])).filter(Boolean)
+    responsaveis: Array.from(new Set([
+      ...stock.map(s => s.autorizadoPor || ''), 
+      ...stock.map(s => s.responsavelManutencao || ''),
+      ...stock.map(s => s.mecanicoTeste || ''),
+      ...stock.map(s => s.autorizadoTeste || '')
+    ])).filter(Boolean)
   }), [stock]);
 
   const filteredStock = stock.filter(item => 
@@ -145,12 +152,15 @@ const StockTab: React.FC<StockTabProps> = ({
     const extras: Partial<StockItem> = {
       ...actionData,
       dataSaida: newStatus === 'Em Manutenção' ? new Date().toLocaleDateString('pt-BR') : actionData.dataSaida,
-      // Se voltar para estoque, limpamos os campos de empréstimo/manutenção
+      // Se voltar para estoque, limpamos os campos de empréstimo/manutenção/teste
       ...(newStatus === 'Em Estoque' ? {
         localAtual: '',
         autorizadoPor: '',
         responsavelManutencao: '',
         motivoManutencao: '',
+        mecanicoTeste: '',
+        autorizadoTeste: '',
+        osTeste: '',
         dataSaida: '',
         previsaoRetorno: ''
       } : {})
@@ -165,7 +175,9 @@ const StockTab: React.FC<StockTabProps> = ({
     setFormData({
       descricao: '', tipo: config.tipos[0] || 'Outros', frequencia: config.frequencias[0] || 'Outra',
       aplicacao: '', serial: '', quantidade: 1, status: 'Em Estoque', localAtual: '',
-      autorizadoPor: '', responsavelManutencao: '', motivoManutencao: '', dataSaida: '', previsaoRetorno: ''
+      autorizadoPor: '', responsavelManutencao: '', motivoManutencao: '', 
+      mecanicoTeste: '', autorizadoTeste: '', osTeste: '',
+      dataSaida: '', previsaoRetorno: ''
     });
   };
 
@@ -230,6 +242,7 @@ const StockTab: React.FC<StockTabProps> = ({
                   <td>
                     ${item.status === 'Em Estoque' ? 'Depósito' : 
                       item.status === 'Emprestado' ? `${item.localAtual} (Aut: ${item.autorizadoPor})` :
+                      item.status === 'Em Teste' ? `TESTE: ${item.mecanicoTeste} (OS: ${item.osTeste})` :
                       `${item.responsavelManutencao}${item.motivoManutencao ? ` - Motivo: ${item.motivoManutencao}` : ''}`}
                   </td>
                 </tr>
@@ -367,6 +380,7 @@ const StockTab: React.FC<StockTabProps> = ({
                       <div className={`inline-flex px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-tighter print:border print:text-black ${
                         item.status === 'Em Estoque' ? 'bg-green-500/10 text-green-400 border border-green-500/20' :
                         item.status === 'Emprestado' ? 'bg-amber-500/10 text-amber-400 border border-amber-500/20' : 
+                        item.status === 'Em Teste' ? 'bg-purple-500/10 text-purple-400 border border-purple-500/20' :
                         'bg-blue-500/10 text-blue-400 border border-blue-500/20'
                       }`}>
                         {item.status}
@@ -405,6 +419,13 @@ const StockTab: React.FC<StockTabProps> = ({
                               Motive: {item.motivoManutencao}
                             </span>
                           )}
+                        </div>
+                      ) : item.status === 'Em Teste' ? (
+                        <div className="flex flex-col gap-1">
+                          <div className="flex items-center gap-2 text-[10px] text-purple-300">
+                            <ClipboardList className="w-3 h-3 no-print" /> OS: {item.osTeste}
+                          </div>
+                          <span className="text-[9px] text-slate-500 uppercase ml-5">MEC: {item.mecanicoTeste} | AUT: {item.autorizadoTeste}</span>
                         </div>
                       ) : (
                         <span className="text-[10px] text-slate-600 italic">No Depósito</span>
@@ -521,9 +542,9 @@ const StockTab: React.FC<StockTabProps> = ({
               <button type="button" onClick={() => setModalMode('NONE')} className="p-2 hover:bg-slate-800 rounded-full text-slate-400"><X className="w-5 h-5" /></button>
             </div>
             <div className="p-8 space-y-6">
-              <div className="grid grid-cols-3 gap-3">
-                {['Em Estoque', 'Emprestado', 'Em Manutenção'].map(st => (
-                  <button key={st} type="button" onClick={() => setActionData({...actionData, status: st as any})} className={`py-3 rounded-xl text-[10px] font-bold uppercase transition-all border ${(actionData.status || selectedItem.status) === st ? 'bg-indigo-600 border-indigo-500 text-white shadow-lg' : 'bg-slate-950 border-slate-800 text-slate-500 hover:border-slate-700'}`}>{st}</button>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                {['Em Estoque', 'Emprestado', 'Em Manutenção', 'Em Teste'].map(st => (
+                  <button key={st} type="button" onClick={() => setActionData({...actionData, status: st as any})} className={`py-3 rounded-xl text-[9px] font-bold uppercase transition-all border ${(actionData.status || selectedItem.status) === st ? 'bg-indigo-600 border-indigo-500 text-white shadow-lg' : 'bg-slate-950 border-slate-800 text-slate-500 hover:border-slate-700'}`}>{st}</button>
                 ))}
               </div>
               {(actionData.status || selectedItem.status) === 'Emprestado' && (
@@ -536,6 +557,18 @@ const StockTab: React.FC<StockTabProps> = ({
                 <div className="space-y-4 p-6 bg-blue-500/5 border border-blue-500/20 rounded-2xl">
                   <Autocomplete label="Técnico / Registro" value={actionData.responsavelManutencao || selectedItem.responsavelManutencao || ''} onChange={v => setActionData({...actionData, responsavelManutencao: v})} suggestions={suggestions.responsaveis} placeholder="RESPONSÁVEL" required />
                   <Autocomplete label="Motivo" value={actionData.motivoManutencao || selectedItem.motivoManutencao || ''} onChange={v => setActionData({...actionData, motivoManutencao: v})} suggestions={[]} placeholder="MOTIVO" required />
+                </div>
+              )}
+              {(actionData.status || selectedItem.status) === 'Em Teste' && (
+                <div className="space-y-4 p-6 bg-purple-500/5 border border-purple-500/20 rounded-2xl">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <Autocomplete label="Mecânico" value={actionData.mecanicoTeste || selectedItem.mecanicoTeste || ''} onChange={v => setActionData({...actionData, mecanicoTeste: v})} suggestions={suggestions.responsaveis} placeholder="NOME DO MECÂNICO" required />
+                    <Autocomplete label="Autorizado por" value={actionData.autorizadoTeste || selectedItem.autorizadoTeste || ''} onChange={v => setActionData({...actionData, autorizadoTeste: v})} suggestions={suggestions.responsaveis} placeholder="QUEM AUTORIZOU" required />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-extrabold text-slate-500 uppercase tracking-widest ml-1">Ordem de Serviço (O.S)</label>
+                    <input required value={actionData.osTeste || selectedItem.osTeste || ''} onChange={e => setActionData({...actionData, osTeste: e.target.value.toUpperCase()})} placeholder="EX: 12345" className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm text-white focus:border-indigo-500 outline-none" />
+                  </div>
                 </div>
               )}
             </div>
