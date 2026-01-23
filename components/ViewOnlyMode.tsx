@@ -1,8 +1,10 @@
 
 import React from 'react';
-import { CheckCircle2, Plus, Smartphone, Database, ShieldCheck, Printer } from 'lucide-react';
-import { LabelData, LabelSettings } from '../types';
+import { CheckCircle2, Plus, Smartphone, Database, ShieldCheck, Printer, Cpu, Info, Clock, MapPin, Settings as SettingsIcon, ClipboardList } from 'lucide-react';
+import { LabelData, LabelSettings, StockItem } from '../types';
 import LabelComponent from './Label';
+import { doc, getDoc } from 'firebase/firestore';
+import { db } from '../firebase';
 
 interface ViewOnlyModeProps {
   data: LabelData;
@@ -10,6 +12,20 @@ interface ViewOnlyModeProps {
 }
 
 const ViewOnlyMode: React.FC<ViewOnlyModeProps> = ({ data, initialSettings }) => {
+  const [stockItem, setStockItem] = React.useState<StockItem | null>(null);
+
+  React.useEffect(() => {
+    const fetchStockItem = async () => {
+      if (data.stockItemId) {
+        const docRef = doc(db, 'stock', data.stockItemId);
+        const docSnap = await getDoc(docRef);
+        if (docSnap.exists()) {
+          setStockItem({ ...docSnap.data(), id: docSnap.id } as StockItem);
+        }
+      }
+    };
+    fetchStockItem();
+  }, [data.stockItemId]);
   return (
     <div className="min-h-screen bg-[#020617] flex flex-col items-center p-6 md:p-12 overflow-x-hidden">
       {/* Background Decorative Elements */}
@@ -53,59 +69,141 @@ const ViewOnlyMode: React.FC<ViewOnlyModeProps> = ({ data, initialSettings }) =>
 
         {/* Detailed Data Section */}
         <div className="space-y-6 animate-in fade-in slide-in-from-right-8 duration-700 delay-400">
-          <div className="bg-[#0f172a] border border-slate-800 rounded-[32px] p-8 md:p-10 shadow-2xl relative overflow-hidden">
-            <div className="absolute top-0 right-0 p-6 opacity-5 pointer-events-none">
-                <Database className="w-32 h-32" />
+            {/* NOVA SESSÃO: DADOS DO MÓDULO VINCULADO */}
+            {stockItem && (
+              <div className="bg-slate-900 border border-indigo-500/30 rounded-[32px] p-8 md:p-10 shadow-2xl relative overflow-hidden mb-6">
+                <div className="absolute top-0 right-0 p-6 opacity-5 pointer-events-none">
+                    <Cpu className="w-32 h-32 text-indigo-400" />
+                </div>
+                
+                <div className="flex justify-between items-start mb-8">
+                  <h2 className="text-xl font-bold text-white border-l-4 border-indigo-500 pl-4 uppercase">Informações do Módulo</h2>
+                  <div className={`px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest border ${
+                    stockItem.status === 'Em Estoque' ? 'bg-green-500/10 text-green-400 border-green-500/20' :
+                    stockItem.status === 'Emprestado' ? 'bg-amber-500/10 text-amber-400 border-amber-500/20' : 
+                    stockItem.status === 'Em Teste' ? 'bg-purple-500/10 text-purple-400 border-purple-500/20' :
+                    'bg-blue-500/10 text-blue-400 border-blue-500/20'
+                  }`}>
+                    {stockItem.status}
+                  </div>
+                </div>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-4">
+                    <div className="flex items-start gap-4">
+                      <div className="bg-slate-950 p-3 rounded-2xl border border-slate-800">
+                        <Cpu className="w-5 h-5 text-indigo-400" />
+                      </div>
+                      <div>
+                        <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Modelo / Descrição</p>
+                        <p className="text-white font-bold">{stockItem.descricao}</p>
+                      </div>
+                    </div>
+                    
+                    <div className="flex items-start gap-4">
+                      <div className="bg-slate-950 p-3 rounded-2xl border border-slate-800">
+                        <Info className="w-5 h-5 text-indigo-400" />
+                      </div>
+                      <div>
+                        <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Tipo / Frequência</p>
+                        <p className="text-white font-bold">{stockItem.tipo} • {stockItem.frequencia}</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="space-y-4">
+                    <div className="flex items-start gap-4">
+                      <div className="bg-slate-950 p-3 rounded-2xl border border-slate-800">
+                        <Clock className="w-5 h-5 text-indigo-400" />
+                      </div>
+                      <div>
+                        <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Localização Atual</p>
+                        <p className="text-white font-bold">
+                          {stockItem.status === 'Em Estoque' ? 'Depósito Central' : 
+                           stockItem.status === 'Emprestado' ? stockItem.localAtual :
+                           stockItem.status === 'Em Teste' ? `Em Teste (OS: ${stockItem.osTeste})` :
+                           `Manutenção: ${stockItem.responsavelManutencao}`}
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="flex items-start gap-4">
+                      <div className="bg-slate-950 p-3 rounded-2xl border border-slate-800">
+                        <MapPin className="w-5 h-5 text-indigo-400" />
+                      </div>
+                      <div>
+                        <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Última Atualização</p>
+                        <p className="text-white font-bold">{new Date(stockItem.dataAtualizacao).toLocaleDateString('pt-BR')}</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {stockItem.status === 'Em Teste' && (
+                  <div className="mt-8 p-4 bg-purple-500/5 border border-purple-500/20 rounded-2xl flex items-center gap-4">
+                    <ClipboardList className="w-6 h-6 text-purple-400" />
+                    <div>
+                      <p className="text-[9px] font-black text-purple-400 uppercase tracking-widest">Responsável pelo Teste</p>
+                      <p className="text-xs text-white font-bold">{stockItem.mecanicoTeste} (Aut: {stockItem.autorizadoTeste})</p>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+
+            <div className="bg-[#0f172a] border border-slate-800 rounded-[32px] p-8 md:p-10 shadow-2xl relative overflow-hidden">
+              <div className="absolute top-0 right-0 p-6 opacity-5 pointer-events-none">
+                  <Database className="w-32 h-32" />
+              </div>
+              
+              <h2 className="text-xl font-bold text-white mb-8 border-l-4 border-indigo-500 pl-4 uppercase">Dados do Serviço</h2>
+              
+              <div className="space-y-6">
+                <div className="space-y-1 group">
+                  <span className="text-[10px] font-black text-indigo-400 uppercase tracking-[0.2em] ml-1">Proprietário / Cliente</span>
+                  <div className="bg-slate-950/80 border border-slate-800 rounded-2xl px-5 py-4 text-lg font-bold text-white group-hover:border-indigo-500/50 transition-colors">
+                      {data.cliente || 'NÃO INFORMADO'}
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-1">
+                    <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Nº Ordem Serviço</span>
+                    <div className="bg-slate-950/80 border border-slate-800 rounded-2xl px-5 py-4 text-sm font-mono font-bold text-indigo-300">
+                        # {data.os || '---'}
+                    </div>
+                  </div>
+                  <div className="space-y-1">
+                    <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Placa Veículo</span>
+                    <div className="bg-slate-950/80 border border-slate-800 rounded-2xl px-5 py-4 text-sm font-bold text-white uppercase tracking-tighter">
+                        {data.placa || '---'}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-1">
+                    <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Serial (Peça)</span>
+                    <div className="bg-slate-950/80 border border-slate-800 rounded-2xl px-5 py-4 text-sm font-bold text-slate-300 font-mono">
+                        {data.frota || '---'}
+                    </div>
+                  </div>
+                  <div className="space-y-1">
+                    <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Data de Emissão</span>
+                    <div className="bg-slate-950/80 border border-slate-800 rounded-2xl px-5 py-4 text-sm font-bold text-slate-300">
+                        {data.data ? data.data.split('-').reverse().join('/') : '---'}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="space-y-1">
+                  <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Observações Técnicas</span>
+                  <div className="bg-slate-950/80 border border-slate-800 rounded-2xl px-5 py-6 text-sm text-slate-400 leading-relaxed italic border-l-4 border-l-amber-500/50">
+                      "{data.observacao || 'Nenhuma observação técnica adicional registrada para este serviço.'}"
+                  </div>
+                </div>
+              </div>
             </div>
-            
-            <h2 className="text-xl font-bold text-white mb-8 border-l-4 border-indigo-500 pl-4">Informações do Registro</h2>
-            
-            <div className="space-y-6">
-              <div className="space-y-1 group">
-                <span className="text-[10px] font-black text-indigo-400 uppercase tracking-[0.2em] ml-1">Proprietário / Cliente</span>
-                <div className="bg-slate-950/80 border border-slate-800 rounded-2xl px-5 py-4 text-lg font-bold text-white group-hover:border-indigo-500/50 transition-colors">
-                    {data.cliente || 'NÃO INFORMADO'}
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-1">
-                  <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Nº Ordem Serviço</span>
-                  <div className="bg-slate-950/80 border border-slate-800 rounded-2xl px-5 py-4 text-sm font-mono font-bold text-indigo-300">
-                      # {data.os || '---'}
-                  </div>
-                </div>
-                <div className="space-y-1">
-                  <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Placa Veículo</span>
-                  <div className="bg-slate-950/80 border border-slate-800 rounded-2xl px-5 py-4 text-sm font-bold text-white uppercase tracking-tighter">
-                      {data.placa || '---'}
-                  </div>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-1">
-                  <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Frota / ID</span>
-                  <div className="bg-slate-950/80 border border-slate-800 rounded-2xl px-5 py-4 text-sm font-bold text-slate-300">
-                      ID: {data.frota || '---'}
-                  </div>
-                </div>
-                <div className="space-y-1">
-                  <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Data de Emissão</span>
-                  <div className="bg-slate-950/80 border border-slate-800 rounded-2xl px-5 py-4 text-sm font-bold text-slate-300">
-                      {data.data ? data.data.split('-').reverse().join('/') : '---'}
-                  </div>
-                </div>
-              </div>
-
-              <div className="space-y-1">
-                <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Observações Técnicas</span>
-                <div className="bg-slate-950/80 border border-slate-800 rounded-2xl px-5 py-6 text-sm text-slate-400 leading-relaxed italic border-l-4 border-l-amber-500/50">
-                    "{data.observacao || 'Nenhuma observação técnica adicional registrada para este serviço.'}"
-                </div>
-              </div>
-            </div>
-          </div>
 
           <div className="grid grid-cols-2 gap-4">
             <button 
