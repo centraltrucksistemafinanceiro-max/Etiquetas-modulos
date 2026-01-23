@@ -352,8 +352,108 @@ const StockTab: React.FC<StockTabProps> = ({
         </div>
       </div>
 
-      {/* PLANILHA (TABLE) */}
-      <div className="bg-[#0f172a] border border-slate-800 rounded-[32px] overflow-hidden shadow-2xl print:border-none print:shadow-none print:bg-white">
+      {/* MOBILE VIEW (CARDS) */}
+      <div className="grid grid-cols-1 gap-4 md:hidden no-print">
+        {filteredStock.length === 0 ? (
+          <div className="bg-slate-900/50 border border-slate-800 rounded-3xl p-10 text-center text-slate-500 italic">
+            Nenhum registro encontrado.
+          </div>
+        ) : (
+          filteredStock.map(item => (
+            <div key={item.id} className="bg-slate-900/40 border border-slate-800 rounded-[28px] p-6 space-y-5 animate-in slide-in-from-bottom-2 duration-300">
+              <div className="flex justify-between items-start">
+                <div className={`px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-tighter ${
+                  item.status === 'Em Estoque' ? 'bg-green-500/10 text-green-400 border border-green-500/20' :
+                  item.status === 'Emprestado' ? 'bg-amber-500/10 text-amber-400 border border-amber-500/20' : 
+                  item.status === 'Em Teste' ? 'bg-purple-500/10 text-purple-400 border border-purple-500/20' :
+                  'bg-blue-500/10 text-blue-400 border border-blue-500/20'
+                }`}>
+                  {item.status}
+                </div>
+                <div className="bg-slate-950 px-3 py-1 rounded-lg border border-slate-800">
+                  <span className="font-mono text-[10px] text-slate-400">{item.serial}</span>
+                </div>
+              </div>
+
+              <div>
+                <h3 className="text-white font-bold text-lg leading-tight">{item.descricao}</h3>
+                <div className="flex items-center gap-2 mt-1">
+                  <span className="text-indigo-400 text-[10px] font-black uppercase tracking-widest">{item.tipo}</span>
+                  <span className="text-slate-600 text-[10px]">•</span>
+                  <span className="text-slate-400 text-[10px] font-bold">{item.frequencia}</span>
+                </div>
+              </div>
+
+              <div className="bg-slate-950/50 rounded-2xl p-4 border border-slate-800/50">
+                {item.status === 'Emprestado' ? (
+                  <div className="space-y-1.5">
+                    <div className="flex items-center gap-2 text-xs text-amber-200">
+                      <MapPin className="w-3.5 h-3.5" /> {item.localAtual}
+                    </div>
+                    <p className="text-[10px] text-slate-500 uppercase font-bold ml-5">AUTORIZADO POR: {item.autorizadoPor}</p>
+                  </div>
+                ) : item.status === 'Em Manutenção' ? (
+                  <div className="space-y-1.5">
+                    <div className="flex items-center gap-2 text-xs text-blue-300">
+                      <Settings className="w-3.5 h-3.5" /> {item.responsavelManutencao}
+                    </div>
+                    {item.motivoManutencao && (
+                      <p className="text-[10px] text-slate-500 italic ml-5">MOTIVO: {item.motivoManutencao}</p>
+                    )}
+                  </div>
+                ) : item.status === 'Em Teste' ? (
+                  <div className="space-y-1.5">
+                    <div className="flex items-center gap-2 text-xs text-purple-300 font-bold">
+                      <ClipboardList className="w-3.5 h-3.5" /> O.S: {item.osTeste}
+                    </div>
+                    <p className="text-[10px] text-slate-500 uppercase font-bold ml-5">MEC: {item.mecanicoTeste} | AUT: {item.autorizadoTeste}</p>
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-2 text-xs text-slate-500 font-medium italic">
+                    <Package className="w-4 h-4 opacity-20" /> No Depósito / Central
+                  </div>
+                )}
+              </div>
+
+              <div className="flex items-center justify-between pt-2">
+                <div className="flex gap-2">
+                  <button 
+                    onClick={() => { setSelectedItem(item); setModalMode('ACTION'); setActionData({}); }} 
+                    className="p-4 bg-indigo-600/10 text-indigo-400 rounded-2xl border border-indigo-500/20 active:scale-95 transition-all"
+                  >
+                    <ArrowRightLeft className="w-5 h-5" />
+                  </button>
+                  <button 
+                    onClick={() => { setSelectedItem(item); setModalMode('HISTORY'); }} 
+                    className="p-4 bg-slate-800 text-slate-400 rounded-2xl border border-slate-700/50 active:scale-95 transition-all"
+                  >
+                    <HistoryIcon className="w-5 h-5" />
+                  </button>
+                </div>
+                <div className="flex gap-2">
+                  <button 
+                    onClick={() => { setSelectedItem(item); setModalMode('EDIT'); setFormData(item); }} 
+                    className="p-4 bg-slate-800 text-slate-400 rounded-2xl border border-slate-700/50 active:scale-95 transition-all"
+                  >
+                    <Edit className="w-5 h-5" />
+                  </button>
+                  {profile?.role === 'admin' && (
+                    <button 
+                      onClick={() => onDeleteItem(item.id)} 
+                      className="p-4 bg-red-500/10 text-red-500/50 rounded-2xl border border-red-500/10 active:scale-95 transition-all"
+                    >
+                      <Trash2 className="w-5 h-5" />
+                    </button>
+                  )}
+                </div>
+              </div>
+            </div>
+          ))
+        )}
+      </div>
+
+      {/* PLANILHA (DESKTOP) */}
+      <div className="hidden md:block bg-[#0f172a] border border-slate-800 rounded-[32px] overflow-hidden shadow-2xl print:border-none print:shadow-none print:bg-white">
         <div className="overflow-x-auto custom-scrollbar">
           <table className="w-full text-left border-collapse min-w-[1000px] print:min-w-full">
             <thead>
