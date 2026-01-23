@@ -1,7 +1,7 @@
 {
-  "name": "LabelPrinter Scania Pro",
-  "short_name": "LabelPrinter",
-  "description": "Sistema de Impressão de Etiquetas Scania",
+  "name": "Central Stock & Tag",
+  "short_name": "StockTag",
+  "description": "Sistema de Gestão de Estoque e Etiquetas Central Truck",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#020617",

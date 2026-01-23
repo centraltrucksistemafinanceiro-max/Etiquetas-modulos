@@ -30,12 +30,12 @@ const Header: React.FC<HeaderProps> = ({
       <header className="no-print glass-dark sticky top-0 z-50 border-b border-slate-800/60 px-4 md:px-6 py-3 md:py-4">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="bg-indigo-600 p-2 rounded-xl shadow-lg shadow-indigo-900/40">
-              <Printer className="text-white w-4 h-4 md:w-5 md:h-5" />
+            <div className="bg-indigo-600 p-0 rounded-xl shadow-lg shadow-indigo-900/40 overflow-hidden">
+              <img src="/icon.png" alt="Logo" className="w-8 h-8 md:w-10 md:h-10 object-cover" />
             </div>
             <div>
-              <h1 className="text-sm md:text-lg font-bold text-white tracking-tight leading-none">LabelPrinter</h1>
-              <span className="text-[8px] md:text-[10px] font-bold text-indigo-400 uppercase tracking-widest block">Scania Mobile</span>
+              <h1 className="text-sm md:text-lg font-black text-white tracking-tight leading-none uppercase">Central Stock & Tag</h1>
+              <span className="text-[8px] md:text-[10px] font-bold text-indigo-400 uppercase tracking-widest block">Workflow Solutions</span>
             </div>
           </div>
           

@@ -68,17 +68,15 @@ const Login: React.FC = () => {
 
       <div className="w-full max-w-md relative z-10 animate-in fade-in zoom-in-95 duration-500">
         <div className="bg-[#0f172a] border border-slate-800 rounded-[40px] p-10 shadow-2xl">
-          <div className="flex flex-col items-center text-center mb-10">
-            <div className="bg-indigo-600 p-4 rounded-3xl mb-6 shadow-xl shadow-indigo-900/40">
-              <Cpu className="w-10 h-10 text-white" />
+            <div className="bg-indigo-600 p-0 rounded-3xl mb-6 shadow-xl shadow-indigo-900/40 overflow-hidden">
+              <img src="/icon.png" alt="Logo" className="w-16 h-16 object-cover" />
             </div>
-            <h1 className="text-3xl font-black text-white tracking-tight">
-              Acesso Restrito
+            <h1 className="text-3xl font-black text-white tracking-tight uppercase">
+              Central Stock & Tag
             </h1>
-            <p className="text-slate-400 text-sm mt-2">
-              Somente pessoal autorizado Scania
+            <p className="text-slate-400 text-[10px] font-black uppercase tracking-widest mt-2">
+              Management & Tracking System
             </p>
-          </div>
 
           <form onSubmit={handleSubmit} className="space-y-6">
             {error && (
@@ -143,7 +141,7 @@ const Login: React.FC = () => {
         </div>
 
         <p className="text-center mt-10 text-[10px] text-slate-600 font-bold uppercase tracking-widest">
-            Scania Inventory & Label Cloud Management - V1.2
+            Central Truck • Official Workflow Solution - V1.5
         </p>
       </div>
     </div>

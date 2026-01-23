@@ -133,8 +133,8 @@ const AppContent: React.FC = () => {
   if (authLoading) {
     return (
       <div className="min-h-screen bg-[#020617] flex flex-col items-center justify-center">
-        <div className="w-12 h-12 border-4 border-indigo-600/20 border-t-indigo-600 rounded-full animate-spin mb-4"></div>
-        <p className="text-slate-500 font-bold uppercase tracking-widest text-[10px]">Scania Inventory Cloud</p>
+        <div className="w-16 h-16 border-4 border-indigo-600/20 border-t-indigo-600 rounded-full animate-spin mb-6"></div>
+        <p className="text-slate-500 font-bold uppercase tracking-[0.3em] text-[10px]">Central Stock & Tag</p>
       </div>
     );
   }
@@ -231,7 +231,7 @@ const AppContent: React.FC = () => {
       </main>
 
       <footer className="no-print py-8 border-t border-slate-900 text-center">
-        <p className="text-[10px] font-bold text-slate-600 uppercase tracking-[0.2em]">Designed for High Precision Industrial Printing</p>
+        <p className="text-[10px] font-bold text-slate-600 uppercase tracking-[0.2em]">Central Stock & Tag • Precision Inventory</p>
       </footer>
 
       {activeTab === 'labels' && (
