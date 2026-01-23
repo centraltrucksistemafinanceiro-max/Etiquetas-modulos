@@ -38,6 +38,9 @@ export const useLabelStore = () => {
           setViewOnlyData(docSnap.data() as LabelData);
         }
         setLoading(false);
+      }, (error) => {
+        console.error("Erro ao carregar etiqueta:", error);
+        setLoading(false);
       });
     } else if (encodedData) {
       try {
@@ -58,6 +61,9 @@ export const useLabelStore = () => {
         id: doc.id
       })) as HistoryItem[];
       setHistory(items);
+      setLoading(false);
+    }, (error) => {
+      console.error("Erro ao carregar histórico:", error);
       setLoading(false);
     });
 
